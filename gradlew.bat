@@ -34,8 +34,13 @@ set APP_HOME=%DIRNAME%
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+set DEFAULT_JVM_OPTS="-Xmx1G" "-Xms64m"
 
+@rem Use local Gradle installation instead of wrapper
+set GRADLE_EXE=C:\Gradle\gradle-8.12.1\bin\gradle.bat
+if exist "%GRADLE_EXE%" goto execute
+
+@rem Fallback to wrapper if local installation not found
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome
 
@@ -68,11 +73,18 @@ goto fail
 :execute
 @rem Setup the command line
 
+@rem Check if using local Gradle installation
+if exist "%GRADLE_EXE%" goto executeLocalGradle
+
 set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
 
-
-@rem Execute Gradle
+@rem Execute Gradle via wrapper
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %*
+goto end
+
+:executeLocalGradle
+@rem Execute local Gradle installation
+"%GRADLE_EXE%" %*
 
 :end
 @rem End local scope for the variables with windows NT shell
